@@ -1,0 +1,68 @@
+body {
+  background-color: #242424;
+}
+
+.button {
+  margin: 10px;
+  background-color: #3f404d;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #767676;
+  border-radius: 4px;
+  font-size: 16px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: #d4d4d4;
+}
+
+.tweet-text {
+  font-size: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: 10px;
+  border-radius: 6px;
+  border-style: solid;
+  background-color: #4e4e4e;
+  border-width: 1px;
+  border-color: #767676;
+  color: #d4d4d4;
+  display: inline-block;
+  overflow-wrap: break-word;
+}
+
+.textbox {
+  border-radius: 8px;
+  background-color: #4e4e4e;
+  color: white;
+  margin-left: auto;
+  margin-right: auto;
+  width: 300px;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 16px;
+}
+
+.title {
+  color: #d4d4d4;
+  padding: 5px;
+}
+
+.my-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 12px;
+  width: 100%;
+  word-break: break-word;
+}
+
+.root {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.label {
+  color: #d4d4d4;
+}
