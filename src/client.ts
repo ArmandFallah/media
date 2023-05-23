@@ -12,9 +12,10 @@ export const getTweetById = async (id: number) => {
   return json;
 };
 
-export const postNewTweet = async (newTweet: string) => {
+export const postNewTweet = async (newTweet: string, author: string) => {
   const objData = {
     value: newTweet,
+    name: author,
   };
 
   const options = {

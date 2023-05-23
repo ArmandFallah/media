@@ -48,6 +48,7 @@ app.get("/tweets/:id", (request, response) => {
 // Create a new tweet
 app.post("/tweets", (request, response) => {
   const tweetValue = request.body.value;
+  const tweetAuthor = request.body.name;
   if (tweetValue == null || tweetValue === "") {
     console.log("Value is null");
     console.log(request);
@@ -56,8 +57,8 @@ app.post("/tweets", (request, response) => {
   }
 
   client.query(
-    "INSERT INTO tweet(value) VALUES ($1) RETURNING id, value",
-    [tweetValue],
+    "INSERT INTO tweet(value, name) VALUES ($1, $2) RETURNING id, value, name",
+    [tweetValue, tweetAuthor],
     (err, result) => {
       if (err != null) {
         console.log(err);

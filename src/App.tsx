@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 type TweetProps = {
   textbox: string;
   id: number;
+  name: string;
 };
 
 type EditInput = { id: number; newWord: string };
@@ -97,6 +98,7 @@ function Tweet(props: TweetProps) {
       <li className="tweet">
         <div className="profile-picture"></div>
         <div className="tweet-contents">
+          <p className="author-name">{props.name}</p>
           <p className="tweet-text">{props.textbox}</p>
           <div className="tweet-edit-buttons">
             <button className="button" onClick={handleEdit}>
@@ -113,38 +115,41 @@ function Tweet(props: TweetProps) {
   return (
     <li>
       <div className="editor">
-      <textarea
-        className="editbox"
-        ref={editRef}
-        defaultValue={props.textbox}
-      />{" "}
-      <div className="confirm-and-cancel">
-      <button onClick={handleConfirm} className="button">Confirm</button>
-      <button onClick={handleCancel} className="button">Cancel</button>
-      </div>
+        <textarea
+          className="editbox"
+          ref={editRef}
+          defaultValue={props.textbox}
+        />{" "}
+        <div className="confirm-and-cancel">
+          <button onClick={handleConfirm} className="button">Confirm</button>
+          <button onClick={handleCancel} className="button">Cancel</button>
+        </div>
       </div>
     </li>
   );
 }
 
-type TweetObj = { id: number; value: string };
+type TweetObj = { id: number; value: string; name: string };
 type QueryData = Array<TweetObj>;
 
 function App() {
   const textRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const nameRef = React.useRef<HTMLInputElement | null>(null);
   const query = useQuery<QueryData>(["tweets"], () =>
     fetch("http://localhost:3001/tweets").then((res) => res.json())
   );
 
+  type postInput = {newTweet: string, name: string};
+
   const createMutator = useMutation(
-    (newTweet: string) => postNewTweet(newTweet),
+    (obj: postInput) => postNewTweet(obj.newTweet, obj.name),
     {
       onSuccess: (newlyCreatedTweet, _) => {
         queryClient.setQueryData<QueryData>(["tweets"], (tweets) => {
           if (tweets == null) {
             return [newlyCreatedTweet];
           }
-          return [newlyCreatedTweet, ...tweets];
+          return [...tweets, newlyCreatedTweet];
         });
       },
     }
@@ -157,11 +162,11 @@ function App() {
   });
 
   const handleSubmit = () => {
-    if (textRef.current == null) {
+    if (textRef.current == null || nameRef.current == null) {
       return;
     }
 
-    createMutator.mutate(textRef.current.value);
+    createMutator.mutate({newTweet: textRef.current.value, name: nameRef.current.value});
     textRef.current.value = "";
   };
 
@@ -180,19 +185,22 @@ function App() {
   const tweetElements = query.data.map((tweet) => {
     const id = tweet.id;
 
-    return <Tweet textbox={tweet.value} key={id} id={id} />;
+    return <Tweet textbox={tweet.value} key={id} id={id} name={tweet.name} />;
   });
 
   return (
     <div className="root">
       <h1 className="title">Media</h1>
-      <div className="input-stuff">
-        <div className="profile-picture"></div>
-        <div className="input-container">
-          <textarea placeholder="What's going on?" className="textbox" ref={textRef} rows={10} cols={30} />
-          <div className="post-delete">
-            <button className="button" onClick={handleSubmit}>Post</button>
-            <button className="button" onClick={handleDeleteAll}>Delete All</button>
+      <div className="poster">
+        <input className="name-box" placeholder="What's your name?" ref={nameRef}/>
+        <div className="input-stuff">
+          <div className="profile-picture"></div>
+          <div className="input-container">
+            <textarea placeholder="What's going on?" className="textbox" ref={textRef} rows={10} cols={30} />
+            <div className="post-delete">
+              <button className="button" onClick={handleSubmit}>Post</button>
+              <button className="button" onClick={handleDeleteAll}>Delete All</button>
+            </div>
           </div>
         </div>
       </div>
