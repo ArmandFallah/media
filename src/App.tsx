@@ -94,15 +94,19 @@ function Tweet(props: TweetProps) {
 
   if (!isEditing) {
     return (
-      <li>
-        <p className="tweet-text">{props.textbox}</p>
-        <br />
-        <button className="button" onClick={handleEdit}>
-          Edit
-        </button>
-        <button className="button" onClick={() => deleteMutator.mutate(id)}>
-          Delete
-        </button>
+      <li className="tweet">
+        <div className="profile-picture"></div>
+        <div className="tweet-contents">
+          <p className="tweet-text">{props.textbox}</p>
+          <div className="tweet-edit-buttons">
+            <button className="button" onClick={handleEdit}>
+              Edit
+            </button>
+            <button className="button" onClick={() => deleteMutator.mutate(id)}>
+              Delete
+            </button>
+          </div>
+        </div>
       </li>
     );
   }
@@ -178,14 +182,14 @@ function App() {
 
   return (
     <div className="root">
-      <h1 className="title">Aria Media</h1>
+      <h1 className="title">Media</h1>
       <div className="input-stuff">
-        <div>
-          <textarea className="textbox" ref={textRef} rows={10} cols={30} />
-          <br />
+        <div className="profile-picture"></div>
+        <div className="input-container">
+          <textarea placeholder="What's going on?" className="textbox" ref={textRef} rows={10} cols={30} />
           <div className="post-delete">
-            <button onClick={handleSubmit}>Post</button>
-            <button onClick={handleDeleteAll}>Delete All</button>
+            <button className="button" onClick={handleSubmit}>Post</button>
+            <button className="button" onClick={handleDeleteAll}>Delete All</button>
           </div>
         </div>
       </div>
