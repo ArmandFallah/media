@@ -112,14 +112,17 @@ function Tweet(props: TweetProps) {
   }
   return (
     <li>
+      <div className="editor">
       <textarea
         className="editbox"
         ref={editRef}
         defaultValue={props.textbox}
       />{" "}
-      <br />
-      <button onClick={handleConfirm}>Confirm</button>
-      <button onClick={handleCancel}>Cancel</button>
+      <div className="confirm-and-cancel">
+      <button onClick={handleConfirm} className="button">Confirm</button>
+      <button onClick={handleCancel} className="button">Cancel</button>
+      </div>
+      </div>
     </li>
   );
 }
