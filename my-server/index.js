@@ -126,4 +126,16 @@ app.get("/user", (req, res) => {
   );
 });
 
+app.get("/test-listen", async (req, res) => {
+  res.send("Listening for notifications...");
+  try {
+    await client.query("LISTEN new_tweet");
+    client.on("notification", async (data) => {
+      console.log("Notification received:", data);
+    });
+  } catch (err) {
+    console.error("Failed to listen for notifications:", err);
+  }
+});
+
 app.listen(3001, () => console.log("Listening!"));
