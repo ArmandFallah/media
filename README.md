@@ -7,7 +7,7 @@ The application is called Media. It is built with create-react-app, express, and
 1. Frontend: Built with react and sends http requests to the API based on user interaction
 2. Backend: Express server that handles incoming requests and communicates with the PostgreSQL db
 3. Database: PostgreSQL database with one table. Holds information about each tweet
-
+![Visual Overview]()
 ## Getting Started
 
 ### Prerequisites
