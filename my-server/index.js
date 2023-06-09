@@ -1,10 +1,10 @@
 const express = require("express");
 const cors = require("cors");
-const { Client } = require("pg");
+const { Pool } = require("pg");
 const bodyParser = require("body-parser");
 
 const app = express();
-const client = new Client({
+const pool = new Pool({
   user: "postgres",
   database: "tweets_database",
   port: 5432, // default PostgreSQL port is 5432
@@ -18,7 +18,7 @@ app.use(
 );
 app.use(cors());
 
-client.connect((err) => {
+pool.connect((err) => {
   if (err != null) {
     console.error(err);
     return;
@@ -28,7 +28,7 @@ client.connect((err) => {
 
 // Load the page for the user
 app.get("/tweets", (request, response) => {
-  client.query("SELECT * FROM tweet", [], (err, result) => {
+  pool.query("SELECT * FROM tweet", [], (err, result) => {
     console.log(err);
     response.json(result.rows);
   });
@@ -36,7 +36,7 @@ app.get("/tweets", (request, response) => {
 
 // Grab specific tweet by id
 app.get("/tweets/:id", (request, response) => {
-  client.query(
+  pool.query(
     "SELECT * FROM tweet WHERE id = $1",
     [request.params.id],
     (err, result) => {
@@ -56,7 +56,7 @@ app.post("/tweets", (request, response) => {
     return;
   }
 
-  client.query(
+  pool.query(
     "INSERT INTO tweet(value, name) VALUES ($1, $2) RETURNING id, value, name",
     [tweetValue, tweetAuthor],
     (err, result) => {
@@ -79,7 +79,7 @@ app.put("/tweets/:id", (request, response) => {
     return;
   }
 
-  client.query(
+  pool.query(
     "UPDATE tweet SET value = $1 WHERE id = $2 RETURNING value, id",
     [request.body.value, request.params.id],
     (err, result) => {
@@ -91,7 +91,7 @@ app.put("/tweets/:id", (request, response) => {
 
 // Delete all tweeets
 app.delete("/tweets", (request, response) => {
-  client.query("DELETE FROM tweet", () => {
+  pool.query("DELETE FROM tweet", () => {
     response.json({ result: "success" });
   });
 });
@@ -99,14 +99,14 @@ app.delete("/tweets", (request, response) => {
 // Delete existing tweet
 app.delete("/tweets/:id", (request, response) => {
   const id = request.params.id;
-  client.query("DELETE FROM tweet WHERE id = $1", [id], (err, result) => {
+  pool.query("DELETE FROM tweet WHERE id = $1", [id], (err, result) => {
     response.json({ rowsDeleted: result.rowCount });
   });
 });
 
 // Create a new user
 app.post("/user", (req, res) => {
-  client.query(
+  pool.query(
     "INSERT INTO user(username, password) VALUES($1 , $2)",
     [req.body.username, req.body.password],
     (err, result) => {
@@ -117,7 +117,7 @@ app.post("/user", (req, res) => {
 });
 
 app.get("/user", (req, res) => {
-  client.query(
+  pool.query(
     "SELECT id FROM app_user WHERE username = $1 AND password = $2",
     [req.body.username, req.body.password],
     (err, result) => {
@@ -126,16 +126,25 @@ app.get("/user", (req, res) => {
   );
 });
 
-app.get("/test-listen", async (req, res) => {
-  res.send("Listening for notifications...");
-  try {
-    await client.query("LISTEN new_tweet");
-    client.on("notification", async (data) => {
-      console.log("Notification received:", data);
-    });
-  } catch (err) {
-    console.error("Failed to listen for notifications:", err);
-  }
+//SSE endpoint
+app.get("/events", async (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  res.flushHeaders();
+
+  // Listen for new tweets
+  const client = await pool.connect();
+  await client.query("LISTEN new_tweet");
+  client.on("notification", (data) => {
+    const payload = JSON.parse(data.payload);
+    res.write(`data: ${JSON.stringify(payload)}\n\n`);
+  });
+
+  req.on("close", () => {
+    client.release();
+  });
 });
 
 app.listen(3001, () => console.log("Listening!"));

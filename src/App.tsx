@@ -4,10 +4,11 @@ import {
   deleteAllTweets,
   deleteTweetById,
 } from "./client";
-import React from "react";
+import React, { useEffect } from "react";
 import { queryClient } from "./index";
 import { useQuery } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
+import { queries } from "@testing-library/react";
 
 type TweetProps = {
   textbox: string;
@@ -121,8 +122,12 @@ function Tweet(props: TweetProps) {
           defaultValue={props.textbox}
         />{" "}
         <div className="confirm-and-cancel">
-          <button onClick={handleConfirm} className="button">Confirm</button>
-          <button onClick={handleCancel} className="button">Cancel</button>
+          <button onClick={handleConfirm} className="button">
+            Confirm
+          </button>
+          <button onClick={handleCancel} className="button">
+            Cancel
+          </button>
         </div>
       </div>
     </li>
@@ -139,7 +144,7 @@ function App() {
     fetch("http://localhost:3001/tweets").then((res) => res.json())
   );
 
-  type postInput = {newTweet: string, name: string};
+  type postInput = { newTweet: string; name: string };
 
   const createMutator = useMutation(
     (obj: postInput) => postNewTweet(obj.newTweet, obj.name),
@@ -166,13 +171,33 @@ function App() {
       return;
     }
 
-    createMutator.mutate({newTweet: textRef.current.value, name: nameRef.current.value});
+    createMutator.mutate({
+      newTweet: textRef.current.value,
+      name: nameRef.current.value,
+    });
     textRef.current.value = "";
   };
 
   const handleDeleteAll = () => {
     deleteAllMutator.mutate();
   };
+
+  useEffect(() => {
+    const eventSource = new EventSource("http://localhost:3000/events");
+    eventSource.onmessage = (event) => {
+      const newTweet = JSON.parse(event.data);
+      queryClient.setQueryData<QueryData>(["tweets"], (tweets) => {
+        if (tweets == null) {
+          return [newTweet];
+        }
+        return [...tweets, newTweet];
+      });
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   if (query.data == null) {
     return (
@@ -192,14 +217,28 @@ function App() {
     <div className="root">
       <h1 className="title">Media</h1>
       <div className="poster">
-        <input className="name-box" placeholder="What's your name?" ref={nameRef}/>
+        <input
+          className="name-box"
+          placeholder="What's your name?"
+          ref={nameRef}
+        />
         <div className="input-stuff">
           <div className="profile-picture"></div>
           <div className="input-container">
-            <textarea placeholder="What's going on?" className="textbox" ref={textRef} rows={10} cols={30} />
+            <textarea
+              placeholder="What's going on?"
+              className="textbox"
+              ref={textRef}
+              rows={10}
+              cols={30}
+            />
             <div className="post-delete">
-              <button className="button" onClick={handleSubmit}>Post</button>
-              <button className="button" onClick={handleDeleteAll}>Delete All</button>
+              <button className="button" onClick={handleSubmit}>
+                Post
+              </button>
+              <button className="button" onClick={handleDeleteAll}>
+                Delete All
+              </button>
             </div>
           </div>
         </div>
