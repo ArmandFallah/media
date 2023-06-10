@@ -160,7 +160,7 @@ function App() {
             return tweets;
           }
 
-          return [...tweets, newlyCreatedTweet];
+          return [newlyCreatedTweet, ...tweets];
         });
       },
     }
@@ -202,7 +202,7 @@ function App() {
           return tweets;
         }
 
-        return [...tweets, newTweet];
+        return [newTweet, ...tweets];
       });
     };
 
