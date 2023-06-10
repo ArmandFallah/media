@@ -114,28 +114,6 @@ router.delete('/tweets/:id', (request, response) => {
   });
 });
 
-// Create a new user
-router.post('/user', (req, res) => {
-  pool.query(
-    'INSERT INTO user(username, password) VALUES($1 , $2)',
-    [req.body.username, req.body.password],
-    (err, result) => {
-      console.log(err);
-      res.json(result.rows[0]);
-    }
-  );
-});
-
-router.get('/user', (req, res) => {
-  pool.query(
-    'SELECT id FROM app_user WHERE username = $1 AND password = $2',
-    [req.body.username, req.body.password],
-    (err, result) => {
-      res.json(result.rows[0]);
-    }
-  );
-});
-
 // SSE endpoint
 router.get('/events', async (req, res) => {
   res.setHeader('Content-Type', 'text/event-stream');
