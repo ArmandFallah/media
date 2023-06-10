@@ -1,0 +1,13 @@
+[Unit]
+Description=armand-world server
+After=network.target
+
+[Service]
+Environment=NODE_ENV=production
+Type=simple
+User=root
+ExecStart=/usr/bin/node /root/media/my-server/index.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
