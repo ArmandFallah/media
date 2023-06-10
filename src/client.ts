@@ -1,6 +1,6 @@
 export const API =
   process.env.NODE_ENV === 'production'
-    ? 'https://armand.world/api/media'
+    ? 'https://api.armand.world/media'
     : 'http://localhost:3001/media';
 
 export const getAllTweets = async () => {

@@ -1,0 +1,3 @@
+api.armand.world {
+	reverse_proxy :3001
+}

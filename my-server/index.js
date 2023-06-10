@@ -116,10 +116,9 @@ router.delete('/tweets/:id', (request, response) => {
 
 // SSE endpoint
 router.get('/events', async (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream');
+  res.type('text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-
   res.flushHeaders();
 
   // Listen for new tweets

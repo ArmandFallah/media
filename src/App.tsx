@@ -190,6 +190,7 @@ function App() {
 
   useEffect(() => {
     const eventSource = new EventSource(`${API}/events`);
+
     eventSource.onmessage = (event) => {
       const newTweet = JSON.parse(event.data);
       queryClient.setQueryData<QueryData>(['tweets'], (tweets) => {
