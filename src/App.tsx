@@ -1,14 +1,15 @@
 import {
+  getAllTweets,
   postNewTweet,
   putEditTweet,
   deleteAllTweets,
   deleteTweetById,
-} from "./client";
-import React, { useEffect } from "react";
-import { queryClient } from "./index";
-import { useQuery } from "@tanstack/react-query";
-import { useMutation } from "@tanstack/react-query";
-import { queries } from "@testing-library/react";
+  API,
+} from './client';
+import React, { useEffect } from 'react';
+import { queryClient } from './index';
+import { useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
 type TweetProps = {
   textbox: string;
@@ -26,9 +27,9 @@ function Tweet(props: TweetProps) {
   const deleteMutator = useMutation({
     mutationFn: (id: number) => deleteTweetById(id),
     onSuccess: (_, deletedTweetID) => {
-      queryClient.setQueryData<QueryData>(["tweets"], (tweets) => {
+      queryClient.setQueryData<QueryData>(['tweets'], (tweets) => {
         if (tweets == null) {
-          throw new Error("What the hetch man");
+          throw new Error('What the hetch man');
         }
 
         const copy = [...tweets];
@@ -50,10 +51,10 @@ function Tweet(props: TweetProps) {
     (obj: EditInput) => putEditTweet(obj.id, obj.newWord),
     {
       onSuccess: (_, variables) => {
-        queryClient.setQueryData<QueryData>(["tweets"], (tweets) => {
+        queryClient.setQueryData<QueryData>(['tweets'], (tweets) => {
           if (tweets == null) {
             throw new Error(
-              "Tried to edit tweets somehow when they do not exist???"
+              'Tried to edit tweets somehow when they do not exist???'
             );
           }
 
@@ -86,7 +87,7 @@ function Tweet(props: TweetProps) {
 
   const handleConfirm = () => {
     if (editRef.current == null) {
-      throw new Error("Solar flare has flipped a bit :(");
+      throw new Error('Solar flare has flipped a bit :(');
     }
 
     const textAreaWord = editRef.current.value;
@@ -120,7 +121,7 @@ function Tweet(props: TweetProps) {
           className="editbox"
           ref={editRef}
           defaultValue={props.textbox}
-        />{" "}
+        />{' '}
         <div className="confirm-and-cancel">
           <button onClick={handleConfirm} className="button">
             Confirm
@@ -140,9 +141,7 @@ type QueryData = Array<TweetObj>;
 function App() {
   const textRef = React.useRef<HTMLTextAreaElement | null>(null);
   const nameRef = React.useRef<HTMLInputElement | null>(null);
-  const query = useQuery<QueryData>(["tweets"], () =>
-    fetch("http://localhost:3001/tweets").then((res) => res.json())
-  );
+  const query = useQuery<QueryData>(['tweets'], getAllTweets);
 
   type postInput = { newTweet: string; name: string };
 
@@ -150,10 +149,17 @@ function App() {
     (obj: postInput) => postNewTweet(obj.newTweet, obj.name),
     {
       onSuccess: (newlyCreatedTweet, _) => {
-        queryClient.setQueryData<QueryData>(["tweets"], (tweets) => {
+        queryClient.setQueryData<QueryData>(['tweets'], (tweets) => {
           if (tweets == null) {
             return [newlyCreatedTweet];
           }
+
+          if (
+            tweets.find((tweet) => tweet.id === newlyCreatedTweet.id) != null
+          ) {
+            return tweets;
+          }
+
           return [...tweets, newlyCreatedTweet];
         });
       },
@@ -162,7 +168,7 @@ function App() {
 
   const deleteAllMutator = useMutation(() => deleteAllTweets(), {
     onSuccess: () => {
-      queryClient.setQueryData<QueryData>(["tweets"], []);
+      queryClient.setQueryData<QueryData>(['tweets'], []);
     },
   });
 
@@ -175,7 +181,7 @@ function App() {
       newTweet: textRef.current.value,
       name: nameRef.current.value,
     });
-    textRef.current.value = "";
+    textRef.current.value = '';
   };
 
   const handleDeleteAll = () => {
@@ -183,13 +189,18 @@ function App() {
   };
 
   useEffect(() => {
-    const eventSource = new EventSource("http://localhost:3000/events");
+    const eventSource = new EventSource(`${API}/events`);
     eventSource.onmessage = (event) => {
       const newTweet = JSON.parse(event.data);
-      queryClient.setQueryData<QueryData>(["tweets"], (tweets) => {
+      queryClient.setQueryData<QueryData>(['tweets'], (tweets) => {
         if (tweets == null) {
           return [newTweet];
         }
+
+        if (tweets.find((tweet) => tweet.id === newTweet.id) != null) {
+          return tweets;
+        }
+
         return [...tweets, newTweet];
       });
     };

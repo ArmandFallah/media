@@ -2,6 +2,7 @@
   "name": "react3",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/media",
   "dependencies": {
     "@tanstack/react-query": "^4.29.19",
     "@tanstack/react-query-devtools": "^4.29.19",
@@ -20,7 +21,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && rm -rf ../website/dist/media && mv build ../website/dist/media",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

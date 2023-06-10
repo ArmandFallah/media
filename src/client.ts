@@ -1,15 +1,16 @@
+export const API =
+  process.env.NODE_ENV === 'production'
+    ? 'https://armand.world/api/media'
+    : 'http://localhost:3001/media';
+
 export const getAllTweets = async () => {
-  const data = await fetch("http://localhost:3001"); // .then((data) => console.log(data));
-  const json = await data.json();
-  return json;
+  const data = await fetch(`${API}/tweets`);
+  return data.json();
 };
 
-// getAllTweets();
-
 export const getTweetById = async (id: number) => {
-  const data = await fetch(`http://localhost:3001/tweets/${id}`);
-  const json = await data.json();
-  return json;
+  const data = await fetch(`${API}/tweets/${id}`);
+  return data.json();
 };
 
 export const postNewTweet = async (newTweet: string, author: string) => {
@@ -19,17 +20,16 @@ export const postNewTweet = async (newTweet: string, author: string) => {
   };
 
   const options = {
-    method: "POST",
+    method: 'POST',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(objData),
   };
 
-  const data = await fetch("http://localhost:3001/tweets", options);
-  const json = await data.json();
-  return json;
+  const data = await fetch(`${API}/tweets`, options);
+  return data.json();
 };
 
 export const putEditTweet = async (
@@ -41,68 +41,38 @@ export const putEditTweet = async (
   };
 
   const options = {
-    method: "PUT",
+    method: 'PUT',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(objData),
   };
 
-  const data = await fetch(`http://localhost:3001/tweets/${id}`, options);
-  const json = await data.json();
-  return json;
+  const data = await fetch(`${API}/tweets/${id}`, options);
+  return data.json();
 };
 
 export const deleteAllTweets = async () => {
   const options = {
-    method: "DELETE",
+    method: 'DELETE',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
   };
-  const data = await fetch("http://localhost:3001/tweets", options);
-  const json = data.json();
-  return json;
+  const data = await fetch(`${API}/tweets`, options);
+  return data.json();
 };
 
 export const deleteTweetById = async (id: number) => {
   const options = {
-    method: "DELETE",
+    method: 'DELETE',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
     },
   };
-  const data = await fetch(`http://localhost:3001/tweets/${id}`, options);
-  const json = await data.json();
-  return json;
-};
-
-export const createUser = async (username: string, password: string) => {
-  const objData = { username, password };
-
-  const options = {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(objData),
-  };
-
-  const data = await fetch(`http://localhost:3001/user`, options);
-  return data.json();
-};
-
-export const getUser = async (username: string, password: string) => {
-  const objData = new URLSearchParams({ username, password }).toString();
-
-  const options = {
-    method: "GET",
-  };
-
-  const data = await fetch(`http://localhost:3001/user?${objData}`, options);
+  const data = await fetch(`${API}/tweets/${id}`, options);
   return data.json();
 };

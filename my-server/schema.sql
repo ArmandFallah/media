@@ -1,3 +1,5 @@
+CREATE DATABASE tweets_database;
+
 CREATE TABLE tweet (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
